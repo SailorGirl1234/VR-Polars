@@ -1,0 +1,8 @@
+csv
+decimal
+math
+requests
+plotly.graph_objects
+plotly.express
+pandas
+flask
