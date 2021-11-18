@@ -1,6 +1,6 @@
 # **VR POLARS**
 
-## **Video Demo:**  [https://youtu.be/ZrMtMDpTWKs](https://youtu.be/ZrMtMDpTWKs)
+## **Video Demo:**  [https://youtu.be/13EdunA8D1U](https://youtu.be/13EdunA8D1U)
 
 ## **Description:**
 
