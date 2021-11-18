@@ -1,0 +1,250 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Location - ° ' "
+{% endblock %}
+
+{% block main %}
+
+<div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8 col-sm-6 order-2 wind">
+                <div id="windy" class="border border-dark"></div>
+                <script type="text/javascript">
+
+                    var x = window.matchMedia("(max-width: 700px)");
+
+                    var map = L.map('windy').setView([ {{ lat_decimal }}, {{ lon_decimal }}], {{ zoominitial }} );
+
+                    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                        maxZoom: 18,
+                        id: 'mapbox/streets-v11',
+                        tileSize: 512,
+                        zoomOffset: -1,
+                        accessToken: 'pk.eyJ1Ijoic2FpbG9yZ2lybDEyMzQiLCJhIjoiY2twdjloNDR6MTF5NzJxbzEzMnNrcGpybyJ9.dNTP9h4JPX9bQ4G1TYPqJw'
+                    }).addTo(map);
+
+                    function initialize_map(lat_decimal, lon_decimal, zoominitial) {
+
+                        const options = {
+                            // Required: API key
+                            key: 'OqSIVIrwtWf0ZUKBT0VvFZiAn6kLL0GI', // REPLACE WITH YOUR KEY !!!
+
+                            // Put additional console output
+                            verbose: true,
+                            latlon: true,
+
+                            // Optional: Initial state of the map
+                            lat: lat_decimal,
+                            lon: lon_decimal,
+                            zoom: zoominitial,
+                        };
+
+                        if (x.matches) {
+
+                            // Initialize Windy API
+                            windyInit(options, windyAPI => {
+                            // windyAPI is ready, and contain 'map', 'store',
+                            // 'picker' and other usefull stuff
+
+
+                                const { map } = windyAPI;
+
+                                L.popup()
+                                    .setLatLng([lat_decimal, lon_decimal])
+                                    .setContent("<b>Lat: </b>" + ((lat_decimal).toFixed(5)) + "<br><b>Lon: </b>" + ((lon_decimal).toFixed(5)))
+                                    .openOn(map);
+
+                            });
+
+                        } else {
+
+                            // Initialize Windy API
+                            windyInit(options, windyAPI => {
+                                // windyAPI is ready, and contain 'map', 'store',
+                                // 'picker' and other usefull stuff
+                                const { picker, utils, broadcast } = windyAPI;
+
+                                picker.on('pickerOpened', latLon => {
+                                    // picker has been opened at latLon coords
+                                    console.log(latLon);
+
+                                    const { lat, lon, values, overlay } = picker.getParams();
+                                    // -> 48.4, 14.3, [ U,V, ], 'wind'
+                                    console.log(lat, lon, values, overlay);
+
+                                    const windObject = utils.wind2obj(values);
+                                    console.log(windObject);
+                                });
+
+                                picker.on('pickerMoved', latLon => {
+                                    // picker was dragged by user to latLon coords
+                                    console.log(latLon);
+                                });
+
+                                picker.on('pickerClosed', () => {
+                                    // picker was closed
+
+                                });
+
+                                // Wait since wather is rendered
+                                broadcast.once('redrawFinished', () => {
+                                    picker.open({ lat:  lat_decimal , lon:  lon_decimal  });
+                                    // Opening of a picker (async)
+                                });
+                            });
+                        };
+                    };
+
+                    initialize_map( {{ lat_decimal }} , {{ lon_decimal }} , {{ zoominitial }});
+
+                    function getLocation() {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(showPosition);
+                        }else {
+                            console.log("Geolocation is not supported by this browser")
+                        };
+                    };
+
+                    function showPosition(position) {
+
+                        latitude = Number.parseFloat(position.coords.latitude);
+                        n_s = "N";
+                        if (latitude < 0) {
+                            n_s = "S";
+                            latitude = -latitude;
+                        };
+
+                        lat_deg = Math.trunc(latitude);
+                        lat_min = Math.trunc((latitude - lat_deg)*60);
+                        lat_sec = Math.trunc((((latitude - lat_deg)*60)-lat_min)*60);
+
+                        longitude = Number.parseFloat(position.coords.longitude);
+                        e_w = "E";
+                        if (longitude < 0) {
+                            e_w = "W";
+                            longitude = -longitude;
+                        };
+                        lon_deg = Math.trunc(longitude);
+                        lon_min = Math.trunc((longitude - lon_deg)*60);
+                        lon_sec = Math.trunc((((longitude - lon_deg)*60)-lon_min)*60);
+
+                        document.getElementById("lat_deg").value = lat_deg;
+                        document.getElementById("lat_min").value = lat_min;
+                        document.getElementById("lat_sec").value = lat_sec;
+                        document.getElementById("n_s").value = n_s;
+
+                        document.getElementById("lon_deg").value = lon_deg;
+                        document.getElementById("lon_min").value = lon_min;
+                        document.getElementById("lon_sec").value = lon_sec;
+                        document.getElementById("e_w").value = e_w;
+
+                        initialize_map( Number.parseFloat(position.coords.latitude) , Number.parseFloat(position.coords.longitude) , {{ zoominitial }});
+                    };
+
+                </script>
+            </div>
+
+            <div class="col-lg-4 col-sm-6 wind order-1">
+                <form action="/position" method="post">
+                    <h4 class="text-dark">Location Based</h4>
+                    <div class="form-group">
+                        <select class="custom-select" name="boat" required autofocus>
+                            <option disabled value="" hidden selected>Boat</option>
+                            <option value="Class_40">Class 40</option>
+                            <option value="Maxi_100">Super Maxi 100</option>
+                            <option value="Tara">Tara V2</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4 form-group">
+                            <a href="/position" class="btn btn-dark deg_btn" role="button">° ' "</a>
+                        </div>
+                        <div class="col-4 form-group">
+                            <a href="/decimal" class="btn btn-dark deg_btn" role="button">Decimal</a>
+                        </div>
+                        <div class="col-4 form-group">
+                            <button onclick="return getLocation()" class="btn btn-dark deg_btn location" role="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor-fill" viewBox="0 0 16 16">
+                                    <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group deg_label "><label for="lat_deg" class="deg_label">Latitude:</label></div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-3 deg">
+                            <input autocomplete="off" class="form-control deg" id="lat_deg" name="lat_deg" placeholder="°" value="" type="number" min='0' max='90' required autofocus>
+                        </div>
+                        <div class="form-group col-sm-3 deg">
+                            <input autocomplete="off" class="form-control deg" id="lat_min" name="lat_min" placeholder="'" value="" type="number" min='0' max='59' required>
+                        </div>
+                        <div class="form-group col-sm-3 col-8 deg">
+                            <input autocomplete="off" class="form-control deg" id="lat_sec" name="lat_sec" placeholder='"' value="" type="number" min='0' max='59' required>
+                        </div>
+                        <div class="form-group col-sm-3 col-4 deg">
+                            <select class="custom-select deg" id="n_s" name="n_s" required selected="{{ latlon_dms.H }}">
+                                <option value="N" {% if latlon_dms.lat_H == "N" %}selected{% else %}{% endif %}>N</option>
+                                <option value="S" {% if latlon_dms.lat_H == "S" %}selected{% else %}{% endif %}>S</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group deg_label"><label for="lon_deg" class="deg_label">Longitude:</label></div>
+                    <div class="form-row">
+                        <div class="form-group col-sm-3 deg">
+                            <input autocomplete="off" class="form-control deg" id="lon_deg" name="lon_deg" placeholder="°" value="" type="number" min='0' max='90' required>
+                        </div>
+                        <div class="form-group col-sm-3 deg">
+                            <input autocomplete="off" class="form-control deg" id="lon_min" name="lon_min" placeholder="'" value="" type="number" min='0' max='59' required>
+                        </div>
+                        <div class="form-group col-sm-3 col-8 deg">
+                            <input autocomplete="off" class="form-control deg" id="lon_sec" name="lon_sec" placeholder='"' value="" type="number" min='0' max='59' required>
+                        </div>
+                        <div class="form-group col-sm-3 col-4 deg">
+                            <select class="custom-select deg" id="e_w" name="e_w" required >
+                                <option value="E">E</option>
+                                <option value="W">W</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input class="form-control" name="heading" placeholder="Heading" value="" type="number" min='0' max = '360' required>
+                                             <div class="input-group-append">
+                            <div class="input-group-text" style="width: 50px;">°</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="light" {{ light_wind }} id="light">
+                            <label class="custom-control-label" for="light">Light wind sails</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="heavy" {{ heavy_wind }} id="heavy">
+                            <label class="custom-control-label" for="heavy">Heavy wind sails</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="reach" {{ reach }} id="reach">
+                            <label class="custom-control-label" for="reach">Reaching sails</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="foils" {{ foil }} id="foils">
+                            <label class="custom-control-label" for="foils">Foils</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="polish" {{ polish }} id="polish">
+                            <label class="custom-control-label" for="polish">Hull polish</label>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-dark" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

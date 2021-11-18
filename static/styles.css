@@ -1,0 +1,181 @@
+.navbar {
+    font-family: Montserrat, sans-serif;
+    margin-bottom: 0;
+    background-color: #2d2d30;
+    border: 0;
+    font-size: 14px !important;
+    letter-spacing: 4px;
+    opacity: 0.9;
+  }
+  .navbar li a, .navbar .navbar-brand, .nav-link .dropdown-toggle {
+    color: #d5d5d5 !important;
+  }
+  .navbar-nav li a:hover {
+    color: #fff !important;
+  }
+  .navbar-nav li.active a {
+    color: #fff !important;
+    background-color: #29292c !important;
+  }
+  .navbar-default .navbar-toggle {
+    border-color: transparent;
+  }
+  .dropdown-menu {
+    color: #fff;
+    background-color: #5d5d5c !important;
+    font-family: Montserrat, sans-serif;
+    margin-bottom: 0;
+    border: 0;
+    font-size: 14px !important;
+    letter-spacing: 4px;
+  }
+  .dropdown-item {
+    color: #000 !important;
+    padding:7px 24px 7px;
+
+  }
+  .dropdown-item:hover {
+    background-color: red !important;
+  }
+
+.table td, .table hd {
+  padding: 0.2rem 0.75rem 0.2rem 0.75rem;
+}
+
+.wind {
+  margin-bottom: 1rem;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.wind:hover {
+  background-color:#f5f5f5;
+
+}
+
+.best_sail {
+  background-color: grey !important;
+  color: white;
+}
+.best_sail:hover {
+  color: lightGrey !important;
+}
+
+.resp-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 140%;
+}
+
+.resp-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.deg {
+  padding: 6px;
+}
+
+.deg_label {
+  margin:0;
+}
+
+.nav-separator {
+  color: #d5d5d5 !important;
+  padding: 1px 2px 0 2px;
+  font-size: 24px
+}
+
+.deg_units {
+  width:80%;
+}
+
+#deg_min_sec {
+  font-size: 20px;
+  padding: 4px 24px 0;
+}
+
+#windy {
+  height: 550px;
+}
+
+.windy-output{
+  height: 740px !important;
+}
+@media only screen and (max-width: 600px) {
+  .windy-output{
+    height: 550px !important;
+}
+}
+
+.leaflet-control-coordinates {
+	background: white;
+	border-radius: 4px;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
+	cursor: pointer;
+	padding: 2px 5px;
+}
+
+.leaflet-control-coordinates.hidden {
+	display: none;
+}
+
+.leaflet-control-coordinates-lng {
+	padding-left: 5px;
+}
+
+.deg_btn {
+  width: 100%;
+  padding: 6px;
+}
+
+.location {
+  height: 38px;
+}
+
+.polar-position {
+  height: 780px;
+}
+
+.progress-bar {
+  overflow: visible;
+  background-color: transparent;
+  text-align: unset;
+}
+
+small {
+  text-align: center;
+  padding-bottom: 6px;
+}
+
+#homepage-banner {
+  padding: 66px 0 0 0;
+  margin-bottom: -70px;
+}
+
+.main {
+  margin-top: 80px;
+}
+
+iframe {
+  height: 720px;
+  padding-right: 8px;
+  width: 100%;
+}
+
+.iframe-div {
+    height: 720px;
+}
+
+.Port {
+  color: red;
+}
+
+.Starboard {
+  color: green;
+}

@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Wind data
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6 order-sm-1 order-lg-1 wind order-2">
+                <form action="/wind" method="post">
+                    <h4 class="text-dark">Wind data</h4>
+                    <div class="form-group">
+                        <select class="custom-select" name="boat" required>
+                            <option disabled value="" {% if data.boat == "" %}selected{% else %}{% endif %} hidden>Boat</option>
+                            <option value="Class_40" {% if data.boat == "Class_40" %}selected{% else %}{% endif %}>Class 40</option>
+                            <option value="Maxi_100" {% if data.boat == "Maxi_100" %}selected{% else %}{% endif %}>Super Maxi 100</option>
+                            <option value="Tara" {% if data.boat == "Tara" %}selected{% else %}{% endif %}>Tara V2</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input autocomplete="off" class="form-control" name="windSpeed" placeholder="Wind Speed" value="{{ data.tws }}" type="number" min='0' max='70' required>
+                                                <div class="input-group-append">
+                            <div class="input-group-text" style="width: 50px;">kts</div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control" name="windAngle" placeholder="Relative Wind Angle" value="{{ data.twa }}" type="number" min='0' max = '180' required>
+                         <div class="input-group-append">
+                            <div class="input-group-text" style="width: 50px;">°</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="light" {{ data.light_wind }} id="light">
+                            <label class="custom-control-label" for="light">Light wind sails</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="heavy" {{ data.heavy_wind }} id="heavy">
+                            <label class="custom-control-label" for="heavy">Heavy wind sails</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="reach" {{ data.reach }} id="reach">
+                            <label class="custom-control-label" for="reach">Reaching sails</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="foils" {{ data.foil }} id="foils">
+                            <label class="custom-control-label" for="foils">Foils</label>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="polish" {{ data.polish }} id="polish">
+                            <label class="custom-control-label" for="polish">Hull polish</label>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-dark" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6 wind d-none d-sm-block order-sm-3 order-lg-2 iframe-div">
+                <iframe src="{{ url_for('show_polar') }}" class="resp-iframe" frameborder="0"></iframe>
+            </div>
+            <div class="col-lg-3 col-sm-6 order-sm-2 order-lg-3 wind order-1">
+                <div id="output" >
+                    <h4 class="text-dark">Sailing Data</h4>
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Boat:</th>
+                                <th>{% if data.boat != "" %}{{ data.boat }}{% else %}-{% endif %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>TWS:</b></td>
+                                <td><b>{% if data.tws != "" %}{{ data.tws }}kts{% else %}-{% endif %}</b></td>
+                            </tr>
+                            <tr>
+                                <td><b>TWA:</b></td>
+                                <td><b>{% if data.twa != "" %}{{ data.twa }}<sup>o</sup>{% else %}-{% endif %}</b></td>
+                            </tr>
+
+                            {% for sail in range(data.sails | length -1) %}
+                            <tr class = "{{ data.sails[sail].best_sail }}">
+                                <td>{{ data.sails[sail].name }}:</td>
+                                <td>{% if data.sails[sail].speed != 0 %}{{ data.sails[sail].speed }}kts{% else %}-{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td>Foils:</td>
+                                <td>{% if data.foils != "" %}{{ data.foils }}{% else %}-{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td>Hull Polish:</td>
+                                <td>{% if data.hullpolish != "" %}{{ data.hullpolish }}{% else %}-{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr class="bg-dark text-white">
+                                <td><b>Optimums: </b></td>
+                                <td><b>(VMG)</b></td>
+                            </tr>
+                            <tr>
+                                <td><b>Upwind:</b></td>
+                                <td>{{data.sails[7].optimum_upwind.sail}}</td>
+                            </tr>
+                            <tr >
+                                <td>{% if data.sails[7].optimum_upwind.speed != 0 %} {{ data.sails[7].optimum_upwind.speed }}kts VMG {% else %}-{% endif %}</td>
+                                <td>{% if data.sails[7].optimum_upwind.twa != 0 %} {{ data.sails[7].optimum_upwind.twa }}<sup>o</sup>{% else %}-{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Downwind:</b></td>
+                                <td>{{ data.sails[7].optimum_downwind.sail }}</td>
+                            </tr>
+                            <tr>
+                                <td>{% if data.sails[7].optimum_downwind.speed != 0 %} {{ data.sails[7].optimum_downwind.speed }}kts VMG {% else %}-{% endif %}</td>
+                                <td>{% if data.sails[7].optimum_downwind.twa != 0 %} {{ data.sails[7].optimum_downwind.twa }}<sup>o</sup>{% else %}-{% endif %}</td>
+                            </tr>
+                    </table>
+
+                </div>
+                <div class="d-flex justify-content-center">
+                    <a href="/polar" class="btn btn-dark " role="button" target="_blank">Polar Chart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
